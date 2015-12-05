@@ -1,0 +1,30 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: 2015-12-05 11:30+0100\n"
+"PO-Revision-Date: 2015-12-05 11:32+0100\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.8.6\n"
+"X-Poedit-Basepath: ..\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: __;_e\n"
+"X-Poedit-SearchPath-0: jugglingPostLang.php\n"
+
+#: jugglingPostLang.php:44
+msgid "Languages"
+msgstr "Sprachen"
+
+#: jugglingPostLang.php:45 jugglingPostLang.php:71 jugglingPostLang.php:114
+#: jugglingPostLang.php:123
+msgid "Language"
+msgstr "Sprache"
+
+#: jugglingPostLang.php:100
+msgid " - not specified - "
+msgstr " - undefiniert - "
