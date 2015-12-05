@@ -174,7 +174,7 @@ class JugglingPostLang {
 	  }
 	}
 
-	public function wrapWithLanguagedDiv($content) {
+	public function wrapWithLanguagedDiv($content, $id = null) {
 		// get posts language
 		global $post;
 		$result = $content;
