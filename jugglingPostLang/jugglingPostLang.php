@@ -51,6 +51,7 @@ class JugglingPostLang {
 				'meta_box_cb' => false, // hide the default meta-box
 			)
 	    );
+		register_taxonomy_for_object_type($this->TAXONOMY_NAME, 'post');
 	
 		// initial values for the taxonomy:
 		wp_insert_term('de', 'juggling_post_language');
