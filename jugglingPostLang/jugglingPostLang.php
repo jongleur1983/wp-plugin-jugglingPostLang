@@ -30,6 +30,28 @@ class JugglingPostLang {
 		
 		add_filter('the_content', array($this, 'wrapWithLanguagedDiv'));
 		add_filter('the_title', array($this, 'wrapWithLanguagedDiv'));
+		
+		// add a language column to pages and posts:
+		add_filter(
+			'manage_posts_columns', 
+			array($this, 'add_language_column'));
+		add_filter(
+			'manage_pages_columns', 
+			array($this, 'add_language_column'));
+		// define the content of the column:
+		add_action(
+			'manage_posts_custom_column', 
+			array($this, 'language_column_content'),
+			10, 2);
+		add_action(
+			'manage_pages_custom_column', 
+			array($this, 'language_column_content'),
+			10, 2);
+		// make the column sortable:
+		// compare http://scribu.net/wordpress/custom-sortable-columns.html
+		add_filter(
+			'manage_edit_sortable_columns', //'manage_edit-posts_sortable_columns', 
+			array($this, 'language_column_sortable'));
 	}
 	
 	public function init() {
@@ -49,6 +71,7 @@ class JugglingPostLang {
 					),
 				'rewrite' => false, // don't rewrite the url part to match the language
 				'meta_box_cb' => false, // hide the default meta-box
+				'query_var' => true
 			)
 	    );
 		register_taxonomy_for_object_type($this->TAXONOMY_NAME, 'post');
@@ -57,12 +80,52 @@ class JugglingPostLang {
 		wp_insert_term('de', 'juggling_post_language');
 		wp_insert_term('en', 'juggling_post_language');
 	}
+	
+	public function add_language_column($columns) {
+		return array_merge(
+			$columns,
+			array($this->TAXONOMY_NAME => __('Language', $this->TEXT_DOMAIN))
+			);
+	}
+	
+	public function language_column_content($column, $post_id) {
+		switch ($column) {
+			case $this->TAXONOMY_NAME:
+				$field_values = wp_get_object_terms(
+									$post_id, 
+									$this->TAXONOMY_NAME, 
+									array('fields' => 'names'));
+				$language = (empty($field_values) ? '' : $field_values[0]);
+				echo $language; // TODO: #4 add the flag here
+				break;
+		}
+	}
+	
+	public function language_column_sortable($columns) {
+		/*if (isset($columns[$this->TAXONOMY_NAME]) 
+			&& ($this->TAXONOMY_NAME == $columns[$this->TAXONOMY_NAME])) {
+			$columns = array_merge(
+				$columns, 
+				array(
+					'meta_key' => $this->TAXONOMY_NAME,
+					'orderby' => 'meta_value'
+				));
+			return $columns;
+		}
+		*/
+		echo '<!-- FOO BAR BLUBB -->';
+		$columns[$this->TAXONOMY_NAME] = $this->TAXONOMY_NAME;
+		return $columns;
+	}
 
 	public function languageSelectorContent($post, $metabox) {
 		// generate the html for the box !!!
 		wp_nonce_field(basename(__FILE__), $this->METABOX_NONCE);
 		
-		$old_terms = wp_get_object_terms($post->ID, $this->TAXONOMY_NAME, array('fields' => 'ids') );
+		$old_terms = wp_get_object_terms(
+						$post->ID, 
+						$this->TAXONOMY_NAME, 
+						array('fields' => 'names') );
 		$old_language = (empty($old_terms) ? -1 : $old_terms[0]);
 		
 		echo '<label for="'. $this->METABOX_SELECT_ID .'">';
