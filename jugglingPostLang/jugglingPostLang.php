@@ -364,7 +364,6 @@ class JugglingPostLang {
 
 		$buffer = ob_get_clean();
 		$anyErrorOccurred = !empty($buffer);
-		//ob_end_clean();
 
 		$debugTrace = $debugTrace .')';
 

@@ -7,31 +7,21 @@
  */
 
 function send_multipart_post_message($url, $fields){
-// using WordPress custom functions to retrieve index and apikey
     $eol = "\r\n";
     $data = '';
     $mime_boundary=md5(time());
-//
+
     foreach ($fields as $key => $value) {
         $data .= '--' . $mime_boundary . $eol;
         $data .= 'Content-Disposition: form-data; name="'.$key.'"' . $eol . $eol;
         $data .= $value . $eol;
     }
-//    $data .= '--' . $mime_boundary . $eol;
-//    $data .= 'Content-Disposition: form-data; name="json"; filename="allposts.json"' . $eol;
-//    $data .= 'Content-Type: application/json' . $eol;
-//    $data .= 'Content-Transfer-Encoding: base64' . $eol . $eol;
-//    $data .= base64_encode($json1) . $eol;
-// alternatively use 8bit encoding
-//$data .= 'Content-Transfer-Encoding: 8bit' . $eol . $eol;
-//$data .= $json1 . $eol;
 
     $data .= "--" . $mime_boundary . "--" . $eol . $eol;
     $params = array('http' => array(
         'method' => 'POST',
         'header' => 'Content-Type: multipart/form-data; boundary=' . $mime_boundary,
         'content' => $data
-//'proxy' => 'tcp://localhost:8888' //use with Charles to catch http traffic
     ));
     $ctx = stream_context_create($params);
     $response = file_get_contents($url, FILE_TEXT, $ctx);
@@ -138,8 +128,8 @@ function getSurroundingElement($content) {
         }
     } while ($read = $xml->next());
 
-    $anyErrorOccurred = !empty(ob_get_clean());
-    //ob_end_clean();
+    $buffer = ob_get_clean();
+    $anyErrorOccurred = !empty($buffer);
 
     $debugTrace = $debugTrace .')';
 
