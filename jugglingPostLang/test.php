@@ -33,113 +33,6 @@ function debug($string) {
 }
 
 /**
- * This function should determine the correct way to wrap a given html snipped to produce valid html.
- * - for a transparent content model element T the function is called recursively to determine the content model of T.
- * - phrasing content is a subset of flow content.
- * - div may contain any flow content and is allowed wherever flow content is allowed.
- * - span may contain phrasing content only and is only allowed where phrasing content is expected.
- *
- * Thus as soon as we find any flow content element that is not phrasing content, we use div;
- * else we use span.
- *
- * @param $content string: the html code we want to wrap in a semantically meaningless element
- * @return string the tag name to wrap the content in a valid way.
- */
-function getSurroundingElement($content) {
-    $xml = new XMLReader();
-    $wrappedContent = "<root>$content</root>";
-    $xml->XML($wrappedContent);
-
-    $debugTrace = '';
-//    $phrasingContentElements = [
-//        'a', 'abbr', 'area', 'audio',
-//        'b', 'bdi', 'bdo', 'br', 'button',
-//        'canvas', 'cite', 'code',
-//        'data', 'datalist', 'del', 'dfn',
-//        'em', 'embed',
-//        'i', 'iframe', 'img', 'input', 'ins',
-//        'kbd', 'keygen',
-//        'label', 'link', //(if it is allowed in the body)
-//        'map', 'mark', 'math', 'meta' /* (if the itemprop attribute is present) */, 'meter',
-//        'noscript',
-//        'object', 'output',
-//        'picture', 'progress',
-//        'q',
-//        'ruby',
-//        's', 'samp', 'script', 'select', 'small', 'span', 'strong', 'sub', 'sup', 'svg',
-//        'template', 'textarea', 'time',
-//        'u',
-//        'var', 'video',
-//        'wbr'
-//        // text elements
-//    ];
-
-    $notPhrasingFlowContentElements = [
-        'address', 'article', 'aside',
-        'blockquote',
-        'details', 'dialog', 'div', 'dl',
-        'fieldset', 'figure', 'footer', 'form',
-        'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'header', 'hgroup', 'hr',
-        'main', 'mark', 'menu', 'meter',
-        'nav',
-        'p', 'pre',
-        'section', 'style',
-        'table',
-        'ul'
-    ];
-
-    $transparentElements = [
-        'a',
-        'ins',
-        'del',
-        'object',
-        // <video>, <audio> is transparent but does not have any non-transparent content in the context we need here, TODO: check it!
-        'map',
-        'noscript', // is transparent when scripting is disabled, else it is ignored. Thus we use it as transparent, as that ensures validity.
-        'canvas'
-    ];
-
-    ob_start(); //"warningCallback");
-
-    $xml->read(); // go to the root node
-    $xml->read(); // skip the root node
-    do {
-        $debugTrace .= $xml->name . '('; //.$read.'#';
-        if ($xml->nodeType == XMLReader::ELEMENT) {
-            // if element name is a notPhrasingFlowContentElement, we can return div:
-            $normalizedName = strtolower($xml->name);
-            if (in_array($normalizedName, $transparentElements)) {
-                $contentModelFromRecursion = getSurroundingElement($xml->readInnerXml());
-                if ($contentModelFromRecursion['errorOccurred']) {
-                    return array(
-                        'nodeName' => 'span',
-                        'trace' => $debugTrace,
-                        'errorOccurred' => true);
-                } elseif ($contentModelFromRecursion['nodeName'] == 'div') {
-                    $debugTrace = $debugTrace . $contentModelFromRecursion['trace'] . ')';
-                    return array('nodeName' => 'div',
-                        'trace' => $debugTrace);
-                }
-            } elseif (in_array($normalizedName, $notPhrasingFlowContentElements)) {
-                $debugTrace = $debugTrace . ')';
-                return array('nodeName' => 'div',
-                    'trace' => $debugTrace);
-            }
-        }
-    } while ($read = $xml->next());
-
-    $buffer = ob_get_clean();
-    $anyErrorOccurred = !empty($buffer);
-
-    $debugTrace = $debugTrace .')';
-
-    return array(
-        'nodeName' => 'span',
-        'trace' => $debugTrace,
-        'errorOccurred' => $anyErrorOccurred);
-}
-
-/**
  * Callback called when some error occurs.
  * @param $buffer string the buffer of the output
  * @return string 1, when there's anything in the buffer, empty string otherwise.
@@ -340,6 +233,20 @@ error_reporting(E_ALL | E_NOTICE);
                 <th>success</th>
             </tr>
 <?php
+// mock wordpress functionality:
+function add_action($string, $array, $int1 = 0, $int2 = 1) {
+    // do nothing
+}
+
+function add_filter($string, $array) {
+    // do nothing
+}
+
+// include and instantiate plugin class:
+require_once 'jugglingPostLang.php';
+$jugglingPostLang =  new JugglingPostLang();
+
+// test the function:
 foreach ([
              '<html/>' => false,
              ' ' => true,
@@ -357,7 +264,7 @@ foreach ([
     echo '<td>'.simplePrettyPrintXml($item).'</td>';
 
     // trace:
-    $result = getSurroundingElement($item);
+    $result = $jugglingPostLang->getSurroundingElement($item);
     echo '<td>'.$result['trace'].'</td>';
 
     // output (result)
