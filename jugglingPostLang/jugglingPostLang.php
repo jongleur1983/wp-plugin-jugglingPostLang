@@ -343,7 +343,7 @@ class JugglingPostLang {
 				// if element name is a notPhrasingFlowContentElement, we can return div:
 				$normalizedName = strtolower($xml->name);
 				if (in_array($normalizedName, $transparentElements)) {
-					$contentModelFromRecursion = getSurroundingElement($xml->readInnerXml());
+					$contentModelFromRecursion = $this->getSurroundingElement($xml->readInnerXml());
 					if ($contentModelFromRecursion['errorOccurred']) {
 						return array(
 							'nodeName' => 'span',
