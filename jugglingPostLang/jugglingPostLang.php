@@ -279,7 +279,7 @@ class JugglingPostLang {
 	 * @param $content string: the html code we want to wrap in a semantically meaningless element
 	 * @return string the tag name to wrap the content in a valid way.
 	 */
-	function getSurroundingElement($content) {
+	public function getSurroundingElement($content) {
 		$xml = new XMLReader();
 		$wrappedContent = "<root>$content</root>";
 		$xml->XML($wrappedContent);
